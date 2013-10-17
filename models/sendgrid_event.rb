@@ -1,4 +1,5 @@
 require 'httparty'
+require 'uri'
 
 class SendGridEvent
   def initialize(event_hash = {})
@@ -9,25 +10,25 @@ class SendGridEvent
   def record
     if can_record_event?
       post_hash = {
-        :_n => event,
+        :_n => km_event_name,
         :current_account => account_id
       }.merge(km_properties)
 
-      HTTParty.post(@post_url, :body => post_hash)
+      HTTParty.post(@post_url, :body => URI.encode_www_form(post_hash))
     end
     nil
   end
 
   def can_record_event?
-    !from_internal_email? && has_param?("account_id")
+    !from_internal_email? && has_param?("account_id") && has_param?("event")
   end
 
   def account_id
-    @event["account_id"] if has_param?("account_id")
+    @event["account_id"]
   end
 
   def km_event_name
-    "Templated Email #{@event["event"]}" if has_param?("event")
+    "Templated Email #{@event["event"]}"
   end
 
   def km_properties
@@ -59,10 +60,6 @@ class SendGridEvent
       "cancelations@kissmetrics.com",
       "feedback@kissmetrics.com"
     ]
-    internal_emails.index(self.email)
-  end
-
-  def email
-    @event["email"] if has_param?("email")
+    internal_emails.index(@event["email"])
   end
 end

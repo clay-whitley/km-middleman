@@ -1,6 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'setup'))
 require 'base64'
 require 'webmock/rspec'
+require 'uri'
 
 describe "POST /sendgrid.track" do
   before do
@@ -44,35 +45,31 @@ describe "POST /sendgrid.track" do
     end
 
     it "POSTs the hash of parameters to app.kissmetrics.com/services/track" do
-=begin
       post '/sendgrid.track', click_data, {'HTTP_AUTHORIZATION' => @auth}
       a_request(:post, "https://app.kissmetrics.com/services/track").
-        with(:body => {
+        with(:body => hash_including({
           "_n" => "Templated Email click",
           "Email Template Name" => "click_template",
-          "Current Account" => 5,
+          "current_account" => 5,
           "Email URL Clicked" => "http://www.example.com/landing"
-          }).should have_been_made.once
-=end
+          })).should have_been_made.once
     end
 
     it "makes a POST to app.kissmetrics.com/services/track for each event" do
-=begin
       post '/sendgrid.track', multi_line, {'HTTP_AUTHORIZATION' => @auth}
       a_request(:post, "https://app.kissmetrics.com/services/track").
-        with(:query => {
+        with(:body => hash_including({
           "_n" => "Templated Email open",
           "Email Template Name" => "new_template",
-          "Current Account" => 5
-          }).should have_been_made.once
+          "current_account" => 5
+          })).should have_been_made.once
 
       a_request(:post, "https://app.kissmetrics.com/services/track").
-        with(:body => {
+        with(:body => hash_including({
           "_n" => "Templated Email open",
           "Email Template Name" => "new_template_alt",
-          "Current Account" => 5
-          }).should have_been_made.once
-=end
+          "current_account" => 5
+          })).should have_been_made.once
     end
   end
 end
