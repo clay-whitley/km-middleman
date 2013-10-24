@@ -14,6 +14,7 @@ class SendGridEvent
         :current_account => account_id
       }.merge(km_properties)
 
+      puts "Attempting to post with parameters: #{URI.encode_www_form(post_hash)}"
       HTTParty.post(@post_url, :body => URI.encode_www_form(post_hash))
     end
     nil
