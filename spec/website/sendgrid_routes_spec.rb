@@ -44,6 +44,12 @@ describe "POST /sendgrid.track" do
       last_response.body.should include("Acknowledged")
     end
 
+    it "has a HTTP header setting Origin to middleman.kissmetrics.com" do
+      post '/sendgrid.track', click_data, {'HTTP_AUTHORIZATION' => @auth}
+      a_request(:post, "https://app.kissmetrics.com/services/track").
+        with(:headers => {"Origin" => "http://middleman.kissmetrics.com"}).should have_been_made.once
+    end
+
     it "POSTs the hash of parameters to app.kissmetrics.com/services/track" do
       post '/sendgrid.track', click_data, {'HTTP_AUTHORIZATION' => @auth}
       a_request(:post, "https://app.kissmetrics.com/services/track").

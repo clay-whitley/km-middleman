@@ -5,6 +5,7 @@ class SendGridEvent
   def initialize(event_hash = {})
     @event = event_hash
     @post_url = "https://app.kissmetrics.com/services/track"
+    @origin = "http://middleman.kissmetrics.com"
   end
 
   def record
@@ -15,7 +16,7 @@ class SendGridEvent
       }.merge(km_properties)
 
       puts "Attempting to post with parameters: #{URI.encode_www_form(post_hash)}"
-      HTTParty.post(@post_url, :body => URI.encode_www_form(post_hash))
+      HTTParty.post(@post_url, :headers => {"Origin" => @origin}, :body => URI.encode_www_form(post_hash))
     end
     nil
   end
